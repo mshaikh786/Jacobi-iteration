@@ -8,6 +8,7 @@ EXE=../../bin/heat_eq_serial_$(CC)
 all: heat_eq_serial
 
 heat_eq_serial: heat_eq.o
+	@mkdir -p ../../bin
 	$(CC) $(CFLAGS) heat_eq.o -o $(EXE) $(LDFLAGS)
 
 %.o: %.c
