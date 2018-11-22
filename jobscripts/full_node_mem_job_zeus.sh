@@ -16,9 +16,15 @@
 #      REVISION:  ---
 #===============================================================================
 
-#SBATCH --ntasks=16
+#SBATCH --account=pawsey0001
+#SBATCH --ntasks=28
+#SBATCH --time=01:00:00
 #SBATCH --export=NONE
-#SBATCH --cpus-per-task=1
-#SBATCH --ntasks-per-node=16
 
-srun --export=all -n 16 -N 1 -c 1 --cpu-bind=sockets pat_run ./heat_eq_mpi -m 500 -r 85000 -c 85000
+
+module load vtune
+module load gcc/5.5.0 openmpi/2.1.2
+
+export PATH=$PATH:../bin
+
+srun --export=all -n 28 -N 1 --cpu-bind=sockets amplxe-cl -c hpc-performance -r results-${SLURM_JOBID} /group/pawsey0001/mshaikh/Application_testsuite/my_codes/mem-stressers/bin/heat_eq_mpi_zeus -m 50 -r 86000 -c 86000

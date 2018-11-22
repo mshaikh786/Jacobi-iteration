@@ -1,0 +1,22 @@
+This is a Jacobian solver solving tempreature gradient in a metal plate 
+modelled by 2D Laplace equation. 
+
+There is a serial and MPI verison of the code. 
+
+
+BUILD:
+There are makefiles for a Cray and non-Cray system (in Pawsey's case, Zeus). 
+To build, simply change directory to the desired version and run:
+make -f Makefile.CRAY  
+or 
+make -f Makefile.ZEUS 
+
+The resulting exeuctables should end up in "bin" directory. 
+
+
+RUN:
+The default problem size is set to 2000 x 2000 grid points but can be increased using 
+-r and -c parameters as command line arguments. This will increase the heap allocation by the code.
+Default iterations are set to 1000 but can be modified using -m command line argument.
+
+

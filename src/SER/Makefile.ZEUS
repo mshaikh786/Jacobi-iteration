@@ -1,13 +1,14 @@
-CC=cc
+CC=gcc
 ifeq ($(VIS),1)
 	INC=-DVIS -I../../include/
 endif
-CFLAGS=-DROWS=2000 -DCOLS=2000 $(INC)
-EXE=heat_eq_serial
+CFLAGS=-DROWS=2000 -DCOLS=2000 $(INC) -std=gnu99
+LDFLAGS=-lm
+EXE=../../bin/heat_eq_serial_$(CC)
 all: heat_eq_serial
 
 heat_eq_serial: heat_eq.o
-	$(CC) $(CFLAGS) heat_eq.o -o $(EXE)
+	$(CC) $(CFLAGS) heat_eq.o -o $(EXE) $(LDFLAGS)
 
 %.o: %.c
 		$(CC) -c -o $@ $< $(CFLAGS)
