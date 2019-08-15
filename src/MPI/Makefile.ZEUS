@@ -3,7 +3,7 @@ ifeq ($(VIS),1)
 	INC=-DVIS -I../../include/
 endif
 CFLAGS=-DROWS=2000 -DCOLS=2000 $(INC) -g 
-LDFLAGS=
+LDFLAGS=-lm
 EXE=../../bin/heat_eq_mpi
 
 mpi: heat_eq_mpi.o
