@@ -4,7 +4,7 @@ ifeq ($(VIS),1)
 endif
 CFLAGS=-DROWS=2000 -DCOLS=2000 $(INC) -g 
 LDFLAGS=
-EXE=../../bin/heat_eq_mpi_${CRAY_CPU_TARGET}
+EXE=../../bin/heat_eq_mpi
 
 mpi: heat_eq_mpi.o
 	@mkdir -p ../../bin
