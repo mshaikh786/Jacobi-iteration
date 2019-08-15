@@ -4,7 +4,7 @@ ifeq ($(VIS),1)
 endif
 CFLAGS=-DROWS=2000 -DCOLS=2000 $(INC) -std=gnu99
 LDFLAGS=-lm
-EXE=../../bin/heat_eq_serial_$(CC)
+EXE=../../bin/heat_eq_serial
 all: heat_eq_serial
 
 heat_eq_serial: heat_eq.o
