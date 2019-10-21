@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-import os,sys,getopt
-
+import os,sys,getopt,re,subprocess as sb
 def usage():
 	print (sys.argv[0] + ' -i <input directory path> -o <output directory path>')
 
@@ -63,12 +62,24 @@ def read_header (indir):
 	return H
 
 
+def get_timestamps(indir):
+	timestamps=list()
+	dirname = os.path.join(indir,'0')
+	out = sb.run(['ls','%s' %dirname],stdout=sb.PIPE,stderr=sb.PIPE)
+	files = str(out.stdout.decode('utf8')).split()
+	if len(files) == 0:
+		print(str(out.stderr.decode('utf8')))
+		exit()
+	else:
+		for fname in files:
+			timestamps.append(re.findall(r'[0-9]+',fname)[0]);
+	return(timestamps)
+
 def write_header (outdir,H,chkpoint_indx):
 	"""
 
 	"""
-	suffix=str(100*chkpoint_indx)
-	filename=str(outdir+'/'+'iter'+suffix+'.vtk')
+	filename=os.path.join(outdir,'iter'+chkpoint_indx+'.vtk')
 	fp = open(filename,'w+')
 	for line in H:
 		fp.write(line)
@@ -89,49 +100,47 @@ def read_parms(indir):
 		P[tmp[0].strip()]=int(tmp[1].strip())
 	return (P)
 
+
+		
+
 def read_celldata(indir,numranks,chkpoint_indx):
 	"""
 
-	"""
+	"""		
 	data=list()
-	suffix=str(100*chkpoint_indx)
 	for i in range(numranks):
-		D=list()
-		filename=str(indir+'/'+str(i)+'/'+'iter'+suffix)
+		filename=os.path.join(indir,str(i),'iter'+chkpoint_indx)
 		fp=open(filename,'r+')
 		tmp = fp.readlines()
 		fp.close()
-
-		for line in tmp:
-			D.append(line.strip().split(' ')) 
-
-		for p in range(len(D)):
-			for q in range(len(D[p])):
-				data.append(float(D[p][q]))
-		del tmp,D
+		for l in range(len(tmp)):
+			elements = tmp[l].strip().split()
+			for e in elements:
+				data.append(float(e)) 
 	return(data)
 
 def write_celldata(outdir, Temp, chkpoint_indx):
 	"""
 
 	"""
-	suffix=str(100*chkpoint_indx)
-	filename=str(outdir+'/'+'iter'+suffix+'.vtk')
+	filename=os.path.join(outdir,'iter'+chkpoint_indx+'.vtk')
 	fp = open(filename,'a+')
-	for line in Temp:
-		fp.write(str(line))
-		fp.write('\n')
+	for t in Temp:
+		fp.write("%2.4f " %t)
+	fp.write('\n')
 	fp.close()
+
 
 if __name__ == '__main__':
 	indir,outdir,num_parts=arg_parse(sys.argv[1:])
 	
 	P=read_parms(indir)
 	header=read_header(indir)
-	for i in range(P['num_checkpoint']):
-		write_header(outdir,header,i)
+	timestamps=get_timestamps(indir)
+	for checkpoint_indx in timestamps:
+		write_header(outdir,header,checkpoint_indx)
 
-	for i in range(P['num_checkpoint']):
-		T=read_celldata(indir,P['numranks'],i)
-		write_celldata(outdir,T,i)
+	for checkpoint_indx in timestamps:
+		T=read_celldata(indir,P['numranks'],checkpoint_indx)
+		write_celldata(outdir,T,checkpoint_indx)
 		del T
