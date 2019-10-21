@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+void print_stencil (int, int,float**);
 int write_dataset_vtk(int r, int c, float** A, int iter){
 
 	char filename[256];
@@ -33,7 +33,6 @@ int write_dataset_vtk(int r, int c, float** A, int iter){
 		}
 	fprintf(fp,"\n");
 	} 
-
 
 	fclose(fp);	
 	return 0;
