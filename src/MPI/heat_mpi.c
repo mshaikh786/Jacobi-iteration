@@ -13,22 +13,22 @@
 #endif
 
 #ifndef ROWS
-#define ROWS		1000
+#define ROWS		2046
 #endif
 #ifndef COLS
-#define COLS		1000
+#define COLS		2046
 #endif
 #ifndef MAX_ITER
-#define MAX_ITER	1000
+#define MAX_ITER	4000
 #endif
 #ifndef TOL
-#define TOL		1e-3
+#define TOL		1e-4
 #endif
 #ifndef MAX_TEMP
 #define MAX_TEMP	100.0
 #endif
 #ifndef CHKPNT_ITER
-#define CHKPNT_ITER	100
+#define CHKPNT_ITER	1000
 #endif
 
 float** allocate(int, int, float**);

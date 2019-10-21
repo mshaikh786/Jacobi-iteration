@@ -1,34 +1,36 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
+#include <omp.h>
 #ifdef VIS
 #include "vis.h"
 #endif
 
 #ifndef ROWS
-#define ROWS		1000
+#define ROWS		2046
 #endif
 #ifndef COLS
-#define COLS		1000
+#define COLS		2046
 #endif
 #ifndef MAX_ITER
-#define MAX_ITER	1000
+#define MAX_ITER	4000
 #endif
 #ifndef TOL
-#define TOL		1e-3
+#define TOL		1e-4
 #endif
 #ifndef MAX_TEMP
 #define MAX_TEMP	100.0
 #endif
 #ifndef CHKPNT_ITER
-#define CHKPNT_ITER	100
+#define CHKPNT_ITER	1000
 #endif
 
 float** allocate(int, int, float**);
 void init_grid(int, int, float**, float);
 
 int main(int argc, char *argv[]) {
+
+
 
 	int rows = ROWS + 2, cols = COLS + 2;
 	int i = 0, j = 0;
@@ -63,6 +65,7 @@ int main(int argc, char *argv[]) {
 	init_grid(rows, cols, T_old, max_temp);
 	init_grid(rows, cols, T_new, max_temp);
 
+	fprintf(stdout,"Hostname = %s\n",getenv("HOSTNAME"));
 	fprintf(stdout, "INPUT PARAMETERS\n================\n");
 
 	fprintf(stdout, "ROWS = %d  , COLS = %d\n", rows - 2, cols - 2);
@@ -83,22 +86,25 @@ int main(int argc, char *argv[]) {
 		}
 #endif
 
+
+#pragma omp for
 		for (i = 1; i < rows - 1; i++) {
 			for (j = 1; j < cols - 1; j++) {
 				T_new[i][j] = 0.25
 						* (T_old[i - 1][j] + T_old[i + 1][j] + T_old[i][j - 1]
 								+ T_old[i][j + 1]);
-
 			}
 		}
 
 		dT = 0.0;
+#pragma omp for reduction(max:dT)
 		for (i = 1; i < rows - 1; i++) {
 			for (j = 1; j < cols - 1; j++) {
 				dT = fmaxf(fabsf(T_new[i][j] - T_old[i][j]), dT);
 				T_old[i][j] = T_new[i][j];
 			}
 		}
+
 		iter++;
 	}
 
@@ -134,6 +140,7 @@ float** allocate(int rows, int cols, float **T) {
 void init_grid(int rows, int cols, float **T, float max_temp) {
 	int i = 0, j = 0;
 
+#pragma omp for
 	for (i = 0; i < rows; i++) {
 		for (j = 0; j < cols; j++) {
 			T[i][j] = max_temp * 0.75;
@@ -145,11 +152,14 @@ void init_grid(int rows, int cols, float **T, float max_temp) {
 	T[rows-1][0] 		= max_temp;
 
 	// Set left and rigth boundary initial values
+
+#pragma omp for
 	for (i = 1; i < rows-1; i++) {
 		T[i][0] = max_temp;
 		T[i][cols - 1] = max_temp * 0.75;
 	}
 	// Set top and bottom boundary initial values
+#pragma omp for
 	for (j = 1; j < cols-1; j++) {
 		T[0][j] = max_temp;
 		T[rows - 1][j] = max_temp * 0.75;
