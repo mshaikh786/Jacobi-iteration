@@ -1,8 +1,8 @@
-CC=cc
+CC=mpicc
 ifeq ($(VIS),1)
 	INC=-DVIS -Iinclude/
 endif
-CFLAGS=-homp -h msglevel_4 $(INC)
+CFLAGS=$(INC)
 SRC=./src
 BIN=./bin
 LIBS=-lm
